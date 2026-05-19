@@ -22,7 +22,7 @@ import SettingsTab from './tabs/SettingsTab';
 
 function App() {
   const {
-    isLoggedIn, role, userName, login, setupInitialOwner, logout, loginError, settings, rooms,
+    isLoggedIn, role, userName, login, logout, loginError, settings, rooms,
     supabaseLoading, supabaseConfigured
   } = useStore();
 
@@ -30,7 +30,6 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
-  const needsOwnerSetup = (settings.userCredentials || []).length === 0;
   const alertCount = rooms.filter(room => room.status === 'pink' || room.status === 'yellow' || room.status === 'grey').length;
 
   const handleTabClick = (tabName: string) => {
@@ -41,11 +40,9 @@ function App() {
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const username = loginForm.username.trim().toLowerCase();
-    const loggedIn = needsOwnerSetup
-      ? await setupInitialOwner(username || 'owner', loginForm.password)
-      : await login(username, loginForm.password);
+    const loggedIn = await login(username, loginForm.password);
     if (!loggedIn) return;
-    setActiveTab(!needsOwnerSetup && username === 'restaurant' ? 'restaurant' : 'dashboard');
+    setActiveTab(username === 'restaurant' ? 'restaurant' : 'dashboard');
   };
 
   if (!isLoggedIn) {
@@ -56,14 +53,10 @@ function App() {
             <div className="brand-logo"><BedDouble size={28} className="brand-icon" /></div>
           </div>
           <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>{settings.resortName} System</h2>
-          {needsOwnerSetup && (
-            <p className="section-subtitle" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              Create the first owner login for this local database.
-            </p>
-          )}
+          
           <form onSubmit={handleLoginSubmit} className="login-form">
             <div className="form-group">
-              <label>{needsOwnerSetup ? 'Owner username' : 'Username'}</label>
+              <label>Username</label>
               <div className="input-with-icon">
                 <User size={18} className="input-icon" />
                 <input required type="text" className="form-input with-icon" value={loginForm.username} onChange={e => setLoginForm({ ...loginForm, username: e.target.value })} placeholder="Username" />
@@ -73,11 +66,11 @@ function App() {
               <label>Password</label>
               <div className="input-with-icon">
                 <Lock size={18} className="input-icon" />
-                <input required type="password" className="form-input with-icon" value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} placeholder={needsOwnerSetup ? 'Minimum 8 characters' : 'Password'} />
+                <input required type="password" className="form-input with-icon" value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="Password" />
               </div>
             </div>
             {loginError && <p className="text-red" style={{ fontSize: '0.9rem' }}>{loginError}</p>}
-            <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>{needsOwnerSetup ? 'Create Owner Login' : 'Login to Dashboard'}</button>
+            <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>Login to Dashboard</button>
           </form>
         </div>
       </div>

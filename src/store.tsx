@@ -74,7 +74,6 @@ interface StoreCtx extends AppState {
   supabaseConfigured: boolean;
   loginError: string;
   login: (username: string, password: string) => Promise<boolean>;
-  setupInitialOwner: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   // Room ops
   updateRoomStatus: (id: string, status: RoomStatus, guest?: string | null) => void;
@@ -436,28 +435,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(SESSION_KEY, JSON.stringify({ userName: match.username, role: match.role, lastActivity: Date.now(), token }));
     return true;
   }, [settings, verifyPassword]);
-
-  const setupInitialOwner = useCallback(async (username: string, password: string): Promise<boolean> => {
-    if ((settings.userCredentials || []).length > 0) return false;
-    const cleanUsername = username.trim() || 'owner';
-    if (password.length < 8) {
-      setLoginError('Use at least 8 characters for the owner password.');
-      return false;
-    }
-
-    const passwordHash = await createPasswordHash(password);
-    setSettings(prev => ({
-      ...prev,
-      userCredentials: [{ username: cleanUsername, passwordHash, role: 'owner' }],
-    }));
-    setRole('owner');
-    setUserName(cleanUsername);
-    setIsLoggedIn(true);
-    setLoginError('');
-    const token = generateToken();
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ userName: cleanUsername, role: 'owner', lastActivity: Date.now(), token }));
-    return true;
-  }, [settings.userCredentials, createPasswordHash]);
 
   const logout = useCallback(() => {
     setIsLoggedIn(false);
@@ -919,7 +896,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const value: StoreCtx = {
     supabaseLoading, supabaseConfigured,
     isLoggedIn, role, userName, rooms, customers, bookings, orders, menuItems, payments, serviceCharges, inventory, stockMovements, auditLogs, otaSettlements, expenses, bankDeposits, staff: staffList, salaryRecords, leasePayments, settings,
-    loginError, login, setupInitialOwner, logout,
+    loginError, login, logout,
     updateRoomStatus, checkInRoom, startCheckout, collectPaymentForRoom, extendStay, completeCheckout,
     requestCleaning, completeCleaning, markMaintenance, releaseMaintenance,
     createOrder, payOrder, postOrderToRoom, cancelOrder,

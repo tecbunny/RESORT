@@ -39,7 +39,11 @@ export const DEFAULT_SETTINGS: ResortSettings = {
     { name: 'Agoda', commissionPercent: 12 },
     { name: 'Booking.com', commissionPercent: 18 }
   ],
-  userCredentials: [],
+  userCredentials: [
+    { username: 'admin', passwordHash: '24075304a3f2d26f02279170e3ed33405c102a969bc0032b49c0d38c644f51bc', role: 'owner' },
+    { username: 'reception', passwordHash: 'c830e0a5c4df7ee0dfb8b3d68102377c8e9cf6a17b2b73b5efc1c5cb5a796bfa', role: 'reception' },
+    { username: 'restaurant', passwordHash: '3cd5f8d55fa4f7b60517865c71b56fb33767cb40d576a9a08eb19d4536750011', role: 'restaurant' }
+  ],
 };
 
 const ROOM_CONFIGS: { floor: number; category: string; count: number; maxOcc: number }[] = [
