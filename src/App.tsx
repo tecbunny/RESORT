@@ -26,11 +26,30 @@ function App() {
     supabaseLoading, supabaseConfigured
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('resort-management.activeTab') || 'dashboard';
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const alertCount = rooms.filter(room => room.status === 'pink' || room.status === 'yellow' || room.status === 'grey').length;
+
+  // Persist active tab to localStorage on change
+  useEffect(() => {
+    if (isLoggedIn) {
+      localStorage.setItem('resort-management.activeTab', activeTab);
+    }
+  }, [activeTab, isLoggedIn]);
+
+  // Sanitize activeTab based on user role when logged in
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    if (role === 'restaurant' && activeTab !== 'restaurant' && activeTab !== 'bar') {
+      setActiveTab('restaurant');
+    } else if (role === 'reception' && (activeTab === 'staff' || activeTab === 'settings')) {
+      setActiveTab('dashboard');
+    }
+  }, [role, isLoggedIn, activeTab]);
 
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
@@ -42,7 +61,10 @@ function App() {
     const username = loginForm.username.trim().toLowerCase();
     const loggedIn = await login(username, loginForm.password);
     if (!loggedIn) return;
-    setActiveTab(username === 'restaurant' ? 'restaurant' : 'dashboard');
+    
+    // Set proper default tab based on logged in role
+    const defaultTab = username === 'restaurant' ? 'restaurant' : 'dashboard';
+    setActiveTab(defaultTab);
   };
 
   if (!isLoggedIn) {
