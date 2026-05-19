@@ -10,8 +10,8 @@ export default function ReservationsTab() {
   const arrivalBooking = arrival ? reservations.find(booking => booking.id === arrival.bookingId) : null;
 
   return (
-    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', height: '100%', display:'flex', gap:'2rem'}}>
-      <div style={{flex:1}}>
+    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', minHeight: '100%', display:'flex', flexWrap: 'wrap', gap:'2rem'}}>
+      <div style={{flex:1, minWidth: '300px'}}>
         <h2 className="section-title">Reservations</h2>
         <p className="section-subtitle">Create advance bookings and convert arriving guests into checked-in stays.</p>
         <div className="glass-panel" style={{padding:'1rem', marginTop:'1rem', display:'flex', flexDirection:'column', gap:'10px'}}>
@@ -59,9 +59,10 @@ export default function ReservationsTab() {
           <button className="btn-primary" onClick={() => { createReservation({ name: form.name, mobile: form.mobile }, form.roomId, form.checkIn, form.checkOut, Number(form.advance || 0), form.source, form.otaName, form.otaReference, Number(form.otaCommission || 0)); setForm({ name: '', mobile: '', roomId: '', checkIn: '', checkOut: '', advance: '', source: 'Direct', otaName: '', otaReference: '', otaCommission: '' }); }}>Create Reservation</button>
         </div>
       </div>
-      <div style={{flex:2, overflowY:'auto'}}>
+      <div style={{flex:2, minWidth: '320px'}}>
         <h2>Upcoming Reserved Rooms</h2>
-        <table className="data-table" style={{marginTop:'1rem'}}>
+        <div className="table-responsive">
+          <table className="data-table" style={{marginTop:'1rem'}}>
           <thead>
             <tr><th>Room</th><th>Guest</th><th>Source</th><th>Dates</th><th>Advance</th><th>Actions</th></tr>
           </thead>
@@ -81,6 +82,7 @@ export default function ReservationsTab() {
             ))}
           </tbody>
         </table>
+        </div>
         {arrival && arrivalBooking && (
           <div className="glass-panel" style={{padding:'1rem', marginTop:'1rem', display:'grid', gridTemplateColumns:'1fr 1fr 1fr auto', gap:'10px'}}>
             <select className="form-input" value={arrival.idType} onChange={e=>setArrival({...arrival, idType:e.target.value})}>

@@ -24,7 +24,7 @@ export default function AccountsTab() {
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
 
   return (
-    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', height: '100%', display: 'flex', gap: '2rem'}}>
+    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', minHeight: '100%', display: 'flex', flexWrap: 'wrap', gap: '2rem'}}>
       <div style={{flex: 1, minWidth: '300px'}}>
         {/* Account Summary Cards */}
         <h2 className="section-title">Account Summary</h2>
@@ -75,9 +75,10 @@ export default function AccountsTab() {
         </div>
       </div>
 
-      <div style={{flex: 2, overflowY: 'auto'}}>
+      <div style={{flex: 2, minWidth: '320px'}}>
         <h2>Bank Deposit History</h2>
-        <table className="data-table" style={{marginTop: '1rem'}}>
+        <div className="table-responsive">
+          <table className="data-table" style={{marginTop: '1rem'}}>
           <thead>
             <tr><th>Date</th><th>Bank</th><th>Account</th><th>Slip/Ref</th><th>Notes</th><th>Amount</th></tr>
           </thead>
@@ -97,10 +98,12 @@ export default function AccountsTab() {
             )}
           </tbody>
         </table>
+        </div>
 
         {/* Cash Flow Summary */}
         <h2 style={{marginTop: '2rem'}}>Cash Flow Breakdown</h2>
-        <table className="data-table" style={{marginTop: '1rem'}}>
+        <div className="table-responsive">
+          <table className="data-table" style={{marginTop: '1rem'}}>
           <thead>
             <tr><th>Description</th><th style={{textAlign: 'right'}}>Inflow</th><th style={{textAlign: 'right'}}>Outflow</th></tr>
           </thead>
@@ -141,6 +144,7 @@ export default function AccountsTab() {
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

@@ -44,8 +44,8 @@ export default function RestaurantTab() {
   };
 
   return (
-    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', display: 'flex', gap: '2rem', height:'100%'}}>
-      <div style={{flex: 2, overflowY: 'auto'}}>
+    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '2rem', minHeight:'100%'}}>
+      <div style={{flex: 2, minWidth: '300px'}}>
         <h2>Restaurant POS</h2>
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginTop:'10px'}}>
           {foodItems.length === 0 ? (
@@ -58,7 +58,7 @@ export default function RestaurantTab() {
           ))}
         </div>
       </div>
-      <div className="glass-panel" style={{flex: 1, padding: '1rem', display:'flex', flexDirection:'column'}}>
+      <div className="glass-panel" style={{flex: 1, minWidth: '240px', padding: '1rem', display:'flex', flexDirection:'column'}}>
         <h3>Current Order</h3>
         <select value={roomNum} onChange={e => setRoomNum(e.target.value)} className="form-input" style={{marginBottom:'10px', marginTop:'10px'}}>
           <option value="">Walk-in customer</option>
@@ -71,7 +71,7 @@ export default function RestaurantTab() {
         <button className="btn-primary" onClick={handleOrder}>Create Order</button>
       </div>
       
-      <div className="glass-panel" style={{flex: 1, padding: '1rem', overflowY:'auto'}}>
+      <div className="glass-panel" style={{flex: 1, minWidth: '240px', padding: '1rem'}}>
         <h3>Active Orders</h3>
         {orders.filter(o => o.type === 'restaurant' && o.status === 'active').length === 0 && (
           <p className="section-subtitle" style={{marginTop: '1rem'}}>No active restaurant orders.</p>

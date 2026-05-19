@@ -28,7 +28,7 @@ export default function ExpensesTab() {
   const grandTotal = expenses.reduce((s, e) => s + e.amount, 0);
 
   return (
-    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', height: '100%', display:'flex', gap:'2rem'}}>
+    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', minHeight: '100%', display:'flex', flexWrap: 'wrap', gap:'2rem'}}>
       <div style={{flex: 1, minWidth: '300px'}}>
         <h2 className="section-title">Record Expense</h2>
         <p className="section-subtitle">Log outflows for restaurant purchases, resort maintenance, petty cash, and inventory stock.</p>
@@ -95,7 +95,7 @@ export default function ExpensesTab() {
         </div>
       </div>
 
-      <div style={{flex: 2, overflowY: 'auto'}}>
+      <div style={{flex: 2, minWidth: '320px'}}>
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
           <h2>Expense Ledger</h2>
           <select className="form-input" style={{width: 'auto'}} value={filterCategory} onChange={e => setFilterCategory(e.target.value as ExpenseCategory | 'All')}>
@@ -103,7 +103,8 @@ export default function ExpensesTab() {
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
-        <table className="data-table" style={{marginTop:'1rem'}}>
+        <div className="table-responsive">
+          <table className="data-table" style={{marginTop:'1rem'}}>
           <thead>
             <tr><th>Date</th><th>Category</th><th>Description</th><th>Paid To</th><th>Mode</th><th>Receipt</th><th>Amount</th></tr>
           </thead>
@@ -139,6 +140,7 @@ export default function ExpensesTab() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

@@ -35,15 +35,15 @@ export default function StaffTab() {
   const selectedSalaryStaff = staff.find(s => s.id === salaryForm.staffId);
 
   return (
-    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', height: '100%', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', minHeight: '100%', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
       {/* Section Tabs */}
-      <div style={{display: 'flex', gap: '8px'}}>
+      <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
         {([['staff', 'Staff Directory'], ['salary', 'Process Salary'], ['payslip', 'Pay Slips'], ['lease', 'Lease & Rent']] as const).map(([key, label]) => (
           <button key={key} className={section === key ? 'btn-primary' : 'btn-secondary'} onClick={() => setSection(key)}>{label}</button>
         ))}
       </div>
 
-      <div style={{flex: 1, display: 'flex', gap: '2rem', overflow: 'hidden'}}>
+      <div style={{flex: 1, display: 'flex', flexWrap: 'wrap', gap: '2rem', overflow: 'visible'}}>
         {/* ── STAFF DIRECTORY ── */}
         {section === 'staff' && (
           <Fragment>
@@ -68,25 +68,27 @@ export default function StaffTab() {
                 }}>Add Staff Member</button>
               </div>
             </div>
-            <div style={{flex: 1, overflowY: 'auto'}}>
+            <div style={{flex: 1, minWidth: '320px'}}>
               <h3>Staff Directory ({staff.length})</h3>
-              <table className="data-table" style={{marginTop: '0.5rem'}}>
-                <thead><tr><th>Name</th><th>Department</th><th>Designation</th><th>Salary</th><th>Mobile</th><th>Status</th></tr></thead>
-                <tbody>
-                  {staff.map(s => (
-                    <tr key={s.id}>
-                      <td>{s.name}</td>
-                      <td>{s.department}</td>
-                      <td>{s.designation}</td>
-                      <td>₹{s.salary.toLocaleString()}</td>
-                      <td>{s.mobile}</td>
-                      <td>
-                        <button className={`btn-text ${s.status === 'Active' ? 'text-green' : 'text-red'}`} onClick={() => updateStaff(s.id, { status: s.status === 'Active' ? 'Inactive' : 'Active' })}>{s.status}</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="table-responsive">
+                <table className="data-table" style={{marginTop: '0.5rem'}}>
+                  <thead><tr><th>Name</th><th>Department</th><th>Designation</th><th>Salary</th><th>Mobile</th><th>Status</th></tr></thead>
+                  <tbody>
+                    {staff.map(s => (
+                      <tr key={s.id}>
+                        <td>{s.name}</td>
+                        <td>{s.department}</td>
+                        <td>{s.designation}</td>
+                        <td>₹{s.salary.toLocaleString()}</td>
+                        <td>{s.mobile}</td>
+                        <td>
+                          <button className={`btn-text ${s.status === 'Active' ? 'text-green' : 'text-red'}`} onClick={() => updateStaff(s.id, { status: s.status === 'Active' ? 'Inactive' : 'Active' })}>{s.status}</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Fragment>
         )}
@@ -126,25 +128,27 @@ export default function StaffTab() {
                 }}>Process & Pay</button>
               </div>
             </div>
-            <div style={{flex: 1, overflowY: 'auto'}}>
+            <div style={{flex: 1, minWidth: '320px'}}>
               <h3>Salary History</h3>
-              <table className="data-table" style={{marginTop: '0.5rem'}}>
-                <thead><tr><th>Month</th><th>Staff</th><th>Basic</th><th>Adv</th><th>Ded</th><th>Bonus</th><th>Net Pay</th><th>Mode</th></tr></thead>
-                <tbody>
-                  {salaryRecords.map(r => (
-                    <tr key={r.id}>
-                      <td>{r.month}</td>
-                      <td>{r.staffName}</td>
-                      <td>₹{r.basicSalary.toLocaleString()}</td>
-                      <td style={{color: 'var(--status-red)'}}>₹{r.advance}</td>
-                      <td style={{color: 'var(--status-red)'}}>₹{r.deductions}</td>
-                      <td style={{color: 'var(--status-green)'}}>₹{r.bonus}</td>
-                      <td style={{fontWeight: 'bold'}}>₹{r.netPay.toLocaleString()}</td>
-                      <td>{r.paymentMode}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="table-responsive">
+                <table className="data-table" style={{marginTop: '0.5rem'}}>
+                  <thead><tr><th>Month</th><th>Staff</th><th>Basic</th><th>Adv</th><th>Ded</th><th>Bonus</th><th>Net Pay</th><th>Mode</th></tr></thead>
+                  <tbody>
+                    {salaryRecords.map(r => (
+                      <tr key={r.id}>
+                        <td>{r.month}</td>
+                        <td>{r.staffName}</td>
+                        <td>₹{r.basicSalary.toLocaleString()}</td>
+                        <td style={{color: 'var(--status-red)'}}>₹{r.advance}</td>
+                        <td style={{color: 'var(--status-red)'}}>₹{r.deductions}</td>
+                        <td style={{color: 'var(--status-green)'}}>₹{r.bonus}</td>
+                        <td style={{fontWeight: 'bold'}}>₹{r.netPay.toLocaleString()}</td>
+                        <td>{r.paymentMode}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Fragment>
         )}
@@ -206,48 +210,50 @@ export default function StaffTab() {
                 }}>Add Lease Entry</button>
               </div>
             </div>
-            <div style={{flex: 1, overflowY: 'auto'}}>
+            <div style={{flex: 1, minWidth: '320px'}}>
               <h3>Lease & Rent Ledger</h3>
-              <table className="data-table" style={{marginTop: '0.5rem'}}>
-                <thead><tr><th>Description</th><th>Landlord</th><th>Period</th><th>Amount</th><th>Due</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody>
-                  {leasePayments.map(l => (
-                    <tr key={l.id}>
-                      <td>{l.description}</td>
-                      <td>{l.landlord}</td>
-                      <td>{l.period}</td>
-                      <td style={{fontWeight: 'bold'}}>₹{l.amount.toLocaleString()}</td>
-                      <td>{l.dueDate}</td>
-                      <td>
-                        <span style={{
-                          padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem',
-                          background: l.status === 'Paid' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)',
-                          color: l.status === 'Paid' ? '#10b981' : '#f59e0b',
-                        }}>{l.status}</span>
-                      </td>
-                      <td>
-                        {l.status === 'Pending' && (
-                          leasePayForm?.id === l.id ? (
-                            <div style={{display: 'flex', gap: '4px'}}>
-                              <select className="form-input" style={{width: '80px', padding: '4px'}} value={leasePayForm.mode} onChange={e => setLeasePayForm({...leasePayForm, mode: e.target.value as PaymentMode})}>
-                                <option>Cash</option><option>UPI</option><option>Net Banking</option><option>Card</option>
-                              </select>
-                              <input className="form-input" style={{width: '80px', padding: '4px'}} placeholder="Ref" value={leasePayForm.ref} onChange={e => setLeasePayForm({...leasePayForm, ref: e.target.value})} />
-                              <button className="btn-text text-green" onClick={() => { markLeasePaid(l.id, leasePayForm.mode, leasePayForm.ref); setLeasePayForm(null); }}>✓</button>
-                            </div>
-                          ) : (
-                            <button className="btn-text text-green" onClick={() => setLeasePayForm({ id: l.id, mode: 'Cash', ref: '' })}>Mark Paid</button>
-                          )
-                        )}
-                        {l.status === 'Paid' && <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>Paid: {l.paidDate}</span>}
-                      </td>
-                    </tr>
-                  ))}
-                  {leasePayments.length === 0 && (
-                    <tr><td colSpan={7} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>No lease/rent entries yet.</td></tr>
-                  )}
-                </tbody>
-              </table>
+              <div className="table-responsive">
+                <table className="data-table" style={{marginTop: '0.5rem'}}>
+                  <thead><tr><th>Description</th><th>Landlord</th><th>Period</th><th>Amount</th><th>Due</th><th>Status</th><th>Action</th></tr></thead>
+                  <tbody>
+                    {leasePayments.map(l => (
+                      <tr key={l.id}>
+                        <td>{l.description}</td>
+                        <td>{l.landlord}</td>
+                        <td>{l.period}</td>
+                        <td style={{fontWeight: 'bold'}}>₹{l.amount.toLocaleString()}</td>
+                        <td>{l.dueDate}</td>
+                        <td>
+                          <span style={{
+                            padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem',
+                            background: l.status === 'Paid' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)',
+                            color: l.status === 'Paid' ? '#10b981' : '#f59e0b',
+                          }}>{l.status}</span>
+                        </td>
+                        <td>
+                          {l.status === 'Pending' && (
+                            leasePayForm?.id === l.id ? (
+                              <div style={{display: 'flex', gap: '4px'}}>
+                                <select className="form-input" style={{width: '80px', padding: '4px'}} value={leasePayForm.mode} onChange={e => setLeasePayForm({...leasePayForm, mode: e.target.value as PaymentMode})}>
+                                  <option>Cash</option><option>UPI</option><option>Net Banking</option><option>Card</option>
+                                </select>
+                                <input className="form-input" style={{width: '80px', padding: '4px'}} placeholder="Ref" value={leasePayForm.ref} onChange={e => setLeasePayForm({...leasePayForm, ref: e.target.value})} />
+                                <button className="btn-text text-green" onClick={() => { markLeasePaid(l.id, leasePayForm.mode, leasePayForm.ref); setLeasePayForm(null); }}>✓</button>
+                              </div>
+                            ) : (
+                              <button className="btn-text text-green" onClick={() => setLeasePayForm({ id: l.id, mode: 'Cash', ref: '' })}>Mark Paid</button>
+                            )
+                          )}
+                          {l.status === 'Paid' && <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>Paid: {l.paidDate}</span>}
+                        </td>
+                      </tr>
+                    ))}
+                    {leasePayments.length === 0 && (
+                      <tr><td colSpan={7} style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>No lease/rent entries yet.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Fragment>
         )}

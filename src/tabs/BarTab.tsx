@@ -87,7 +87,7 @@ export default function BarTab() {
   };
 
   return (
-    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', height: '100%', display:'flex', flexDirection:'column'}}>
+    <div className="glass-panel animate-fade-in" style={{padding: '1.5rem', minHeight: '100%', display:'flex', flexDirection:'column'}}>
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem'}}>
         <h2>Bar Inventory</h2>
         <div>
@@ -110,7 +110,7 @@ export default function BarTab() {
         <input className="form-input" placeholder="Reason" value={movement.reason} onChange={e=>setMovement({...movement, reason: e.target.value})}/>
         <button className="btn-primary" onClick={() => { addStockMovement(movement.itemId, movement.type, Number(movement.qty), movement.reason || movement.type); setMovement({ itemId: '', type: 'purchase', qty: '', reason: '' }); }}>Save</button>
       </div>
-      <div style={{flex: 1, overflowY: 'auto'}}>
+      <div style={{flex: 1, overflowY: 'auto'}} className="table-responsive">
         <table className="data-table">
           <thead>
             <tr><th>Item</th><th>Category</th><th>Current Stock</th><th>Status</th></tr>
