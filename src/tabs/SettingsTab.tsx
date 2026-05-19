@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '../store';
 import type { ResortSettings } from '../types';
 
@@ -22,6 +22,11 @@ export default function SettingsTab() {
   const [newUser, setNewUser] = useState({ username: '', password: '', role: 'reception' });
   const [userError, setUserError] = useState('');
   const [userSuccess, setUserSuccess] = useState('');
+
+  // Keep local form in sync with global store settings (for cloud loads & user updates)
+  useEffect(() => {
+    setForm(settings);
+  }, [settings]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
