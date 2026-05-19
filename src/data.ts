@@ -40,9 +40,9 @@ export const DEFAULT_SETTINGS: ResortSettings = {
     { name: 'Booking.com', commissionPercent: 18 }
   ],
   userCredentials: [
-    { username: 'admin', passwordHash: '24075304a3f2d26f02279170e3ed33405c102a969bc0032b49c0d38c644f51bc', role: 'owner' },
-    { username: 'reception', passwordHash: 'c830e0a5c4df7ee0dfb8b3d68102377c8e9cf6a17b2b73b5efc1c5cb5a796bfa', role: 'reception' },
-    { username: 'restaurant', passwordHash: '3cd5f8d55fa4f7b60517865c71b56fb33767cb40d576a9a08eb19d4536750011', role: 'restaurant' }
+    { username: 'admin', passwordHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', role: 'owner' },
+    { username: 'reception', passwordHash: '066a4a70376da00eb9e50a8e30725427faf9b9573d0c6430d28316497c889213', role: 'reception' },
+    { username: 'restaurant', passwordHash: 'ee275d64dafcd283c25b00a66fb771834a2c2bfb1a7b472b67cf59fd6936254f', role: 'restaurant' }
   ],
 };
 
