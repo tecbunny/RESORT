@@ -69,8 +69,15 @@ function App() {
                 <input required type="password" className="form-input with-icon" value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="Password" />
               </div>
             </div>
-            {loginError && <p className="text-red" style={{ fontSize: '0.9rem' }}>{loginError}</p>}
-            <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>Login to Dashboard</button>
+            {loginError && <p className="text-red" style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{loginError}</p>}
+            <button 
+              type="submit" 
+              className="btn-primary" 
+              style={{ marginTop: '1rem' }}
+              disabled={supabaseLoading}
+            >
+              {supabaseLoading ? 'Connecting to Cloud...' : 'Login to Dashboard'}
+            </button>
           </form>
         </div>
       </div>
