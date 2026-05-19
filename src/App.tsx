@@ -208,7 +208,9 @@ function App() {
               <span className="user-name" style={{ textTransform: 'capitalize' }}>{userName}</span>
               <span className="user-role" style={{ textTransform: 'capitalize' }}>{role}</span>
             </div>
-            <LogOut size={16} className="logout-icon" onClick={() => { logout(); setSidebarOpen(false); }} />
+            <button className="sidebar-logout-btn" onClick={() => { logout(); setSidebarOpen(false); }} title="Log Out">
+              <LogOut size={16} />
+            </button>
           </div>
         </div>
       </aside>
@@ -241,6 +243,10 @@ function App() {
               <Bell size={20} />{alertCount > 0 && <span className="notification-badge">{alertCount}</span>}
             </button>
             <div className="clock">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            <button className="topbar-logout-btn" onClick={() => logout()} title="Log Out">
+              <LogOut size={16} />
+              <span>Logout</span>
+            </button>
           </div>
         </header>
         <div className="content-area">{renderContent()}</div>

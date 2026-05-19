@@ -149,6 +149,53 @@
   color: var(--status-red);
 }
 
+.sidebar-logout-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+.sidebar-logout-btn:hover {
+  color: var(--status-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.topbar-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+}
+.topbar-logout-btn:hover {
+  background: var(--status-red);
+  color: white;
+  border-color: var(--status-red);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+@media (max-width: 640px) {
+  .topbar-logout-btn span {
+    display: none;
+  }
+  .topbar-logout-btn {
+    padding: 0.4rem;
+  }
+}
+
 /* Main Content */
 .main-content {
   flex: 1;
