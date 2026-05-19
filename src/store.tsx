@@ -348,6 +348,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const syncCollection = useCallback((name: string, data: any) => {
     if (isRemoteChangeRef.current[name]) {
       isRemoteChangeRef.current[name] = false;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../store';
-import type { ResortSettings } from '../types';
+import type { ResortSettings, UserRole } from '../types';
 
 const numberFields: (keyof ResortSettings)[] = [
   'defaultCreditLimit',
@@ -25,6 +25,7 @@ export default function SettingsTab() {
 
   // Keep local form in sync with global store settings (for cloud loads & user updates)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm(settings);
   }, [settings]);
 
@@ -38,7 +39,7 @@ export default function SettingsTab() {
       return;
     }
     
-    const success = await createUser(newUser.username.trim(), newUser.password, newUser.role as any);
+    const success = await createUser(newUser.username.trim(), newUser.password, newUser.role as UserRole);
     if (success) {
       setUserSuccess(`Account "${newUser.username}" created successfully!`);
       setNewUser({ username: '', password: '', role: 'reception' });

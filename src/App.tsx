@@ -45,6 +45,7 @@ function App() {
   useEffect(() => {
     if (!isLoggedIn) return;
     if (role === 'restaurant' && activeTab !== 'restaurant' && activeTab !== 'bar') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab('restaurant');
     } else if (role === 'reception' && (activeTab === 'staff' || activeTab === 'settings')) {
       setActiveTab('dashboard');
