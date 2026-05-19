@@ -13,14 +13,30 @@ ALTER TABLE resort_collections ENABLE ROW LEVEL SECURITY;
 
 -- 3. Create a public read/write policy (suitable for team collaboration)
 -- You can restrict this based on authenticated users in production.
+DROP POLICY IF EXISTS "Allow public read access" ON resort_collections;
 CREATE POLICY "Allow public read access"
     ON resort_collections FOR SELECT
     USING (true);
 
+DROP POLICY IF EXISTS "Allow public insert/update access" ON resort_collections;
 CREATE POLICY "Allow public insert/update access"
     ON resort_collections FOR ALL
-    USING (true)
-    WITH CHECK (true);
+    USING (
+        name IN (
+            'rooms', 'customers', 'bookings', 'orders', 'menuItems', 'payments', 
+            'serviceCharges', 'inventory', 'stockMovements', 'auditLogs', 
+            'otaSettlements', 'expenses', 'bankDeposits', 'staff', 'salaryRecords', 
+            'leasePayments', 'settings'
+        )
+    )
+    WITH CHECK (
+        name IN (
+            'rooms', 'customers', 'bookings', 'orders', 'menuItems', 'payments', 
+            'serviceCharges', 'inventory', 'stockMovements', 'auditLogs', 
+            'otaSettlements', 'expenses', 'bankDeposits', 'staff', 'salaryRecords', 
+            'leasePayments', 'settings'
+        )
+    );
 
 -- 4. Enable Realtime subscription for the collections table
 -- This allows different screens (Reception, Kitchen, Owner) to stay in sync instantly

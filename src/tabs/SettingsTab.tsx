@@ -15,9 +15,32 @@ const numberFields: (keyof ResortSettings)[] = [
 ];
 
 export default function SettingsTab() {
-  const { settings, updateSettings } = useStore();
+  const { settings, updateSettings, createUser, deleteUser, userName: loggedInUser } = useStore();
   const [form, setForm] = useState<ResortSettings>(settings);
   const [saved, setSaved] = useState(false);
+
+  const [newUser, setNewUser] = useState({ username: '', password: '', role: 'reception' });
+  const [userError, setUserError] = useState('');
+  const [userSuccess, setUserSuccess] = useState('');
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUserError('');
+    setUserSuccess('');
+    
+    if (!newUser.username.trim() || newUser.password.length < 6) {
+      setUserError('Password must be at least 6 characters.');
+      return;
+    }
+    
+    const success = await createUser(newUser.username.trim(), newUser.password, newUser.role as any);
+    if (success) {
+      setUserSuccess(`Account "${newUser.username}" created successfully!`);
+      setNewUser({ username: '', password: '', role: 'reception' });
+    } else {
+      setUserError('Failed to create account. Username might already exist.');
+    }
+  };
 
   const setValue = (key: keyof ResortSettings, value: string) => {
     setForm(prev => ({
@@ -115,8 +138,95 @@ export default function SettingsTab() {
         </button>
       </div>
 
-      <button className="btn-primary" style={{marginTop:'2rem'}} onClick={() => { updateSettings(form); setSaved(true); }}>Save Settings</button>
-      {saved && <span className="text-green" style={{marginLeft:'1rem'}}>Settings saved locally.</span>}
+      <h3 className="section-title" style={{marginTop: '2.5rem'}}>User Access Management</h3>
+      <p className="section-subtitle">Create and manage secure staff logins for different resort departments.</p>
+      
+      <div style={{display: 'flex', gap: '2rem', marginTop: '1.5rem', flexWrap: 'wrap'}}>
+        {/* User Accounts List */}
+        <div className="glass-panel" style={{flex: '1 1 350px', padding: '1.2rem', minWidth: '300px'}}>
+          <h4 style={{marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem'}}>Active Accounts</h4>
+          <div style={{display: 'flex', flexDirection: 'column', gap: '0.8rem'}}>
+            {(settings.userCredentials || []).map((cred) => (
+              <div key={cred.username} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)'}}>
+                <div>
+                  <strong style={{textTransform: 'capitalize'}}>{cred.username}</strong>
+                  <span className={`status-badge ${cred.role === 'owner' ? 'active' : cred.role === 'reception' ? 'progress' : 'cleaning'}`} style={{fontSize: '0.75rem', marginLeft: '0.5rem', padding: '1px 6px'}}>
+                    {cred.role}
+                  </span>
+                </div>
+                {cred.username.toLowerCase() !== loggedInUser.toLowerCase() ? (
+                  <button 
+                    className="btn-text text-red" 
+                    onClick={() => {
+                      if (confirm(`Are you sure you want to delete the login for "${cred.username}"?`)) {
+                        deleteUser(cred.username);
+                      }
+                    }}
+                    style={{fontSize: '0.85rem'}}
+                  >
+                    Delete
+                  </button>
+                ) : (
+                  <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic'}}>Active (You)</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Create User Form */}
+        <form onSubmit={handleCreateUser} className="glass-panel" style={{flex: '1 1 350px', padding: '1.2rem', minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+          <h4 style={{marginBottom: '0.2rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem'}}>Create New User</h4>
+          
+          <div className="form-group">
+            <span style={{fontSize: '0.9rem'}}>Username</span>
+            <input 
+              required
+              className="form-input" 
+              placeholder="e.g. receptionist2"
+              value={newUser.username}
+              onChange={e => setNewUser({...newUser, username: e.target.value})}
+            />
+          </div>
+
+          <div className="form-group">
+            <span style={{fontSize: '0.9rem'}}>Password</span>
+            <input 
+              required
+              type="password"
+              className="form-input" 
+              placeholder="Min 6 characters"
+              value={newUser.password}
+              onChange={e => setNewUser({...newUser, password: e.target.value})}
+            />
+          </div>
+
+          <div className="form-group">
+            <span style={{fontSize: '0.9rem'}}>System Role</span>
+            <select 
+              className="form-input"
+              value={newUser.role}
+              onChange={e => setNewUser({...newUser, role: e.target.value})}
+            >
+              <option value="owner">Owner (Full Admin Access)</option>
+              <option value="reception">Receptionist (Front Office & Bills)</option>
+              <option value="restaurant">Restaurant (POS & Menu Only)</option>
+            </select>
+          </div>
+
+          {userError && <p className="text-red" style={{fontSize: '0.85rem', margin: 0}}>{userError}</p>}
+          {userSuccess && <p className="text-green" style={{fontSize: '0.85rem', margin: 0}}>{userSuccess}</p>}
+
+          <button type="submit" className="btn-secondary" style={{marginTop: '0.5rem', width: 'fit-content'}}>
+            + Create Account
+          </button>
+        </form>
+      </div>
+
+      <div style={{marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '1rem'}}>
+        <button className="btn-primary" onClick={() => { updateSettings(form); setSaved(true); }}>Save Global Settings</button>
+        {saved && <span className="text-green" style={{fontWeight: 500}}>Settings saved to cloud and synced!</span>}
+      </div>
     </div>
   );
 }

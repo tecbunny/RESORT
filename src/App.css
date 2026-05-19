@@ -1020,5 +1020,23 @@
   }
 }
 
+/* Reports/Audit Tab Responsive Reflow */
+.reports-tab-container {
+  display: flex;
+  gap: 2rem;
+}
+@media (max-width: 1024px) {
+  .reports-tab-container {
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto;
+  }
+  .reports-tab-stats-column, .reports-tab-log-column {
+    width: 100% !important;
+    flex: none !important;
+  }
+}
+
+
 
 

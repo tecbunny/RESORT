@@ -117,6 +117,8 @@ interface StoreCtx extends AppState {
   markLeasePaid: (id: string, paymentMode: PaymentMode, transactionRef: string) => void;
   // Settings
   updateSettings: (s: Partial<ResortSettings>) => void;
+  createUser: (username: string, password: string, role: UserRole) => Promise<boolean>;
+  deleteUser: (username: string) => void;
   // Audit
   addAuditLog: (action: string, entity: string, entityId: string, oldVal: string, newVal: string, reason: string) => void;
 }
@@ -507,7 +509,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     // Update room
     setRooms(prev => prev.map(r => r.id === roomId ? { ...r, status: 'red' as const, guest: name, guestMobile: mobile, bookingId: bId, bill: Math.max(0, tariff - (activeReservation?.advance || 0)), cleaningsToday: 0 } : r));
-  }, [canUseReception, rooms, customers, bookings, settings, nextId]);
+    addAuditLog('Check In', 'Booking', bId, 'N/A', `Checked In: ${name} (Room ${room.number})`, 'Guest check-in recorded');
+  }, [canUseReception, rooms, customers, bookings, settings, nextId, addAuditLog]);
 
   const startCheckout = useCallback((roomId: string) => rooms.find(r => r.id === roomId), [rooms]);
 
@@ -520,7 +523,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setPayments(prev => [...prev, { id: nextId('PAY'), bookingId: room.bookingId, orderId: null, amount, mode, transactionRef: ref, collectedBy: userName || role, createdAt: now(), reversed: false, reversalReason: null }]);
     setBookings(prev => prev.map(b => b.id === room.bookingId ? { ...b, totalPaid: b.totalPaid + amount } : b));
     setRooms(prev => prev.map(r => r.id === roomId ? { ...r, bill: Math.max(0, r.bill - amount) } : r));
-  }, [canUseReception, rooms, userName, role, nextId]);
+    addAuditLog('Payment Collected', 'Booking', room.bookingId, 'Pending', `Collected ₹${amount} (${mode})`, `Transaction Ref: ${ref}`);
+  }, [canUseReception, rooms, userName, role, nextId, addAuditLog]);
 
   const extendStay = useCallback((roomId: string, newCheckOutDate: string) => {
     if (!canUseReception) return;
@@ -750,7 +754,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const mode: PaymentMode = source === 'OTA' ? 'OTA Collect' : 'Cash';
       setPayments(prev => [...prev, { id: nextId('PAY'), bookingId: bId, orderId: null, amount: advance, mode, transactionRef: otaReference || '', collectedBy: userName || role, createdAt: now(), reversed: false, reversalReason: null }]);
     }
-  }, [canUseReception, rooms, settings, userName, role, nextId]);
+    addAuditLog('Reservation Created', 'Booking', bId, 'N/A', `Reserved Room ${room.number} for ${cust.name}`, `Source: ${source}, Advance: ₹${advance}`);
+  }, [canUseReception, rooms, settings, userName, role, nextId, addAuditLog]);
 
   const confirmReservation = useCallback((bookingId: string) => {
     if (!canUseReception) return;
@@ -758,7 +763,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!booking) return;
     setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'active' } : b));
     setRooms(prev => prev.map(r => r.id === booking.roomId ? { ...r, status: 'red' as const, guest: booking.customerName, guestMobile: booking.mobile, bookingId: booking.id, bill: booking.tariff } : r));
-  }, [canUseReception, bookings]);
+    addAuditLog('Reservation Confirmed', 'Booking', bookingId, 'Reserved', 'Active Check-In', `Guest checked in room ${booking.roomNumber}`);
+  }, [canUseReception, bookings, addAuditLog]);
 
   const cancelReservation = useCallback((bookingId: string) => {
     if (!canUseReception) return;
@@ -766,13 +772,51 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!booking) return;
     setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'cancelled' } : b));
     setRooms(prev => prev.map(r => r.id === booking.roomId && r.status === 'blue' ? { ...r, status: 'green' as const } : r));
-  }, [canUseReception, bookings]);
+    addAuditLog('Reservation Cancelled', 'Booking', bookingId, 'Reserved', 'Cancelled', `Reservation for room ${booking.roomNumber} cancelled`);
+  }, [canUseReception, bookings, addAuditLog]);
 
   // ── Settings ────────────────────────────────────────────
   const updateSettings = useCallback((s: Partial<ResortSettings>) => {
     if (!isOwner) return;
     setSettings(prev => ({ ...prev, ...s }));
-  }, [isOwner]);
+    addAuditLog('Settings Updated', 'Settings', 'Global', 'N/A', `Keys: ${Object.keys(s).join(', ')}`, 'Global resort configuration updated');
+  }, [isOwner, addAuditLog]);
+
+  const createUser = useCallback(async (username: string, password: string, role: UserRole): Promise<boolean> => {
+    if (!isOwner) return false;
+    const cleanUsername = username.trim().toLowerCase();
+    if (!cleanUsername || password.length < 6) return false;
+    
+    // Check if user already exists
+    const existing = (settings.userCredentials || []).find(c => c.username.toLowerCase() === cleanUsername);
+    if (existing) return false;
+
+    const passwordHash = await createPasswordHash(password);
+    const newUser = { username: cleanUsername, passwordHash, role };
+    
+    setSettings(prev => {
+      const updatedCredentials = [...(prev.userCredentials || []), newUser];
+      return { ...prev, userCredentials: updatedCredentials };
+    });
+    
+    addAuditLog('User Created', 'Settings', cleanUsername, 'N/A', `Role: ${role}`, `New account created by owner`);
+    return true;
+  }, [isOwner, settings.userCredentials, createPasswordHash, addAuditLog]);
+
+  const deleteUser = useCallback((username: string) => {
+    if (!isOwner) return;
+    const cleanUsername = username.trim().toLowerCase();
+    
+    // Don't let owner delete their own active logged-in session account
+    if (cleanUsername === userName.toLowerCase()) return;
+
+    setSettings(prev => {
+      const updatedCredentials = (prev.userCredentials || []).filter(c => c.username.toLowerCase() !== cleanUsername);
+      return { ...prev, userCredentials: updatedCredentials };
+    });
+    
+    addAuditLog('User Deleted', 'Settings', cleanUsername, 'Active', 'Deleted', `Account removed by owner`);
+  }, [isOwner, userName, addAuditLog]);
 
   // ── OTA Settlement ─────────────────────────────────────
   const recordOtaSettlement = useCallback((otaName: string, grossAmount: number, commissionDeducted: number, netReceived: number, transactionRef: string, bankDate: string, bookingIds: string[], notes: string) => {
@@ -823,13 +867,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const addStaff = useCallback((s: Omit<Staff, 'id' | 'createdAt'>) => {
     if (!isOwner) return;
     if (!s.name.trim() || !isNonNegativeAmount(s.salary)) return;
-    setStaffList(prev => [...prev, { ...s, id: nextId('STF'), createdAt: now() }]);
-  }, [isOwner, nextId]);
+    const staffId = nextId('STF');
+    setStaffList(prev => [...prev, { ...s, id: staffId, createdAt: now() }]);
+    addAuditLog('Staff Added', 'Staff', staffId, 'N/A', `${s.name} (${s.designation})`, `Salary: ₹${s.salary}`);
+  }, [isOwner, nextId, addAuditLog]);
 
   const updateStaff = useCallback((id: string, updates: Partial<Staff>) => {
     if (!isOwner) return;
+    const existing = staffList.find(s => s.id === id);
+    if (!existing) return;
     setStaffList(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
-  }, [isOwner]);
+    addAuditLog('Staff Updated', 'Staff', id, existing.name, `Updates: ${Object.keys(updates).join(', ')}`, 'Employee details modified');
+  }, [isOwner, staffList, addAuditLog]);
 
   // ── Salary Processing ──────────────────────────────────
   const processSalary = useCallback((staffId: string, month: string, advance: number, deductions: number, bonus: number, paymentMode: PaymentMode, transactionRef: string) => {
@@ -878,7 +927,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     createReservation, confirmReservation, cancelReservation,
     recordOtaSettlement, addExpense, addBankDeposit,
     addStaff, updateStaff, processSalary, addLeasePayment, markLeasePaid,
-    updateSettings, addAuditLog,
+    updateSettings, createUser, deleteUser, addAuditLog,
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
