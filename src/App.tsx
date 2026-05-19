@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard, BedDouble, Users, UtensilsCrossed, Beer, Wallet,
   FileText, Settings, Bell, Search, Menu, LogOut, Lock, User, CalendarCheck, Receipt, Landmark, UsersRound,
